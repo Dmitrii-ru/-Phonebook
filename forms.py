@@ -4,6 +4,11 @@ from settings import settings_dict, fields_text, fields_phone
 
 
 def exit_to_main():
+    """
+    # Выход в главное меню
+
+    """
+
     print('_____________________')
     print('Выход в главное меню')
     import main
@@ -13,60 +18,91 @@ def exit_to_main():
 reg_phone_number = re.compile(r'^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$')
 
 
-def validate_text(param, param_user):
-    max_l = 30
-    len_obj = len(param_user)
-    obj = param_user
+def validate_text(field, field_text_user):
+    """
+    # Validata введенных данных
+    - Проверка полей ['Фамилия', 'Имя', 'Отчество', 'Организация']
+
+    :param field: 'Имя'
+    :param field_text_user: 'Толя'
+    :return: True если прошел проверку
+    """
+
+    max_l = settings_dict.get('max_length_field', 30)
+    len_obj = len(field_text_user)
+    obj = field_text_user
     if len_obj < 2:
-        print(f'Error:Поле {param} должна содержать не менее 2 символов, введенные данные "{param_user}"')
+        print(f'Error:Поле {field} должна содержать не менее 2 символов, введенные данные "{field_text_user}"')
         return False
 
     elif len_obj > max_l:
-        print(f'Error:Поле {param} должна содержать менее 30 символов, '
-              f'введенные данные "{param_user}" длинна {len(param_user)}')
+        print(f'Error:Поле {field} должна содержать менее 30 символов, '
+              f'введенные данные "{field_text_user}" длинна {len(field_text_user)}')
         return False
 
     elif any(char.isdigit() for char in obj):
-        print(f'Error:Поле {param} не должна содержать цифры, введенные данные "{param_user}"')
+        print(f'Error:Поле {field} не должна содержать цифры, введенные данные "{field_text_user}"')
         return False
 
     return True
 
 
-def validate_phone_number(param, param_user):
-    obj = param_user
+def validate_phone_number(field, field_phone_user):
+    """
+    # Validata введенных данных
+    - Проверка полей ['Телефон рабочий', 'Телефон личный']
+
+    :param field: 'Телефон рабочий'
+    :param field_phone_user: '+7(929)927-19-00'
+    :return: True если прошел проверку
+    """
+    obj = field_phone_user
     if obj == 'exit':
         exit_to_main()
     elif not reg_phone_number.match(obj):  # Поверяем на соответствие регулярному выражению
-        print(f'{param_user} должен быть формата +7(XXX)XXX-XX-XX", например: +7(929)927-19-00')
+        print(f'{field_phone_user} должен быть формата +7(XXX)XXX-XX-XX", например: +7(929)927-19-00')
         return False
     return True
 
 
 def form_create_record():
+    """
+    # Создаем новую запись в базе данных
+    - Предлагаем ввести согласно списку полей для заполнения
+    - Если поле не проходит validata, предлагаем ввести данные снова
+
+    """
+
     new_record = {}
 
-    for param in fields_text:
+    for field in fields_text:
         while True:
-            param_user = input(f'{param}: ')
-            if param_user == 'exit':
+            field_text_user = input(f'{field}: ')
+            if field_text_user == 'exit':
                 exit_to_main()
-            if validate_text(param, param_user):
-                new_record[param] = param_user
+            if validate_text(field, field_text_user):
+                new_record[field] = field_text_user
                 break
 
-    for param in fields_phone:
+    for field in fields_phone:
         while True:
-            param_user = input(f'{param}: ')
-            if param_user == 'exit':
+            field_phone_user = input(f'{field}: ')
+            if field_phone_user == 'exit':
                 exit_to_main()
-            if validate_phone_number(param, param_user):
-                new_record[param] = param_user
+            if validate_phone_number(field, field_phone_user):
+                new_record[field] = field_phone_user
                 break
     db_create(new_record)
 
 
 def form_edit_record():
+    """
+    # Редактируем поля в таблице
+    - Получаем старку, разбиваем на строки объекты, объекты разбиваем на параметры
+    - Проверки на корректность введенных данных
+    - Передаем данные для изменения
+
+    """
     params = fields_text + fields_phone
     print('_____________________________________________________________________')
     print('Редактор записей.')
@@ -103,7 +139,7 @@ def form_edit_record():
                         val = validate_phone_number(field, new_field_text)
 
                     if val:
-                        if num_record <= len_db:
+                        if 1 <= num_record <= len_db:
                             db_edit(
                                 {
                                     'num_record': num_record,
@@ -119,6 +155,33 @@ def form_edit_record():
 
 
 def form_search_record():
+    """
+    # Функция ищет записи по полям
+    - Получаем старку, разбиваем на строки объекты, объекты разбиваем на параметры
+    - Проверки на корректность введенных данных
+    - Получаем все записи в базе данных, обходим и проверяем на совпадения с входными данными функции
+    - Отдаем список найденных записей
+
+
+    :return: [
+        {
+          "Фамилия": "Лось",
+          "Имя": "Колян",
+          "Отчество": "Васильевич",
+          "Организация": "Зоопарк",
+          "Телефон рабочий": "+7(929)927-19-01",
+          "Телефон личный": "+7(929)927-19-01"
+        },
+        {
+          "Фамилия": "Иванов",
+          "Имя": "Карл",
+          "Отчество": "Васильевич",
+          "Организация": "Империя",
+          "Телефон рабочий": "+7(929)927-19-02",
+          "Телефон личный": "+7(929)927-19-02"
+        }
+    ]
+    """
     params = fields_text + fields_phone
     print('_____________________________________________________________________')
     print('Поиск записей.')

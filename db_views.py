@@ -1,8 +1,16 @@
 import json
 
-def db_manager(method=None, obj=None):
 
+def db_manager(method=None, obj=None):
+    """
+    Функция работы с базы данных
+
+    """
     if method == 'get':
+        """
+        Возвращаем все данные бд
+
+        """
         try:
             if method == 'get':
                 with open('database/phonebook.txt', 'r') as file:
@@ -16,6 +24,10 @@ def db_manager(method=None, obj=None):
                 return data
 
     elif method == 'post':
+        """
+        Запись новых данных в базу данных
+        
+        """
         existing_data = db_manager(method='get')  # Загрузить существующие данные
         if obj in existing_data:
             return print('Такая запись уже есть')
@@ -30,11 +42,16 @@ def db_manager(method=None, obj=None):
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
     elif method == 'put':
-        existing_data = db_manager(method='get')
-        index_obj = obj['num_record'] - 1
-        field = obj['field']
-        new_field_text = obj['new_field_text']
-        existing_data[index_obj][field] = new_field_text
+        """
+       Обновляю поля записей 
+
+        """
+
+        existing_data = db_manager(method='get')  # Загрузить существующие данные
+        index_obj = obj['num_record'] - 1  # Получаем индекс
+        field = obj['field']  # Поле которое нужно изменить
+        new_field_text = obj['new_field_text']  # На что нужно изменить
+        existing_data[index_obj][field] = new_field_text  # Меняем значение
 
         try:
             with open('database/phonebook.txt', 'w') as file:

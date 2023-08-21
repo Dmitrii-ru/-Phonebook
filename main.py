@@ -5,10 +5,7 @@ from settings import settings_dict, fields_text, fields_phone
 
 def centered_string(obj, custom_wight=None):
     """
-    Функция центрует запись при отображении таблицы
-
-
-
+    # Функция центрует запись при отображении таблицы
     :param obj: текст центровки
     :param custom_wight: кастамные настройки ширины ячейки
     :return: строка с текстом по центру ячейки
@@ -44,16 +41,19 @@ def display_menu():
 
 def display_records(search=False):
     """
-    Функция выводит справочник в консоль
+    # Функция выводит справочник в консоль
+    :param search:True маркер который говорит о том что нужно сделать поиск по полям
 
-
-
-    :param search: True
-    :return: None
     """
     fields = fields_text + fields_phone
 
     if search:
+        """
+        ## search == True
+        - Запускает функцию поиска записи по введенным данным 
+        - Отображение отфильтрованных данных 
+        - Вывод шапки таблицы и данных
+        """
 
         data = form_search_record()
         if not data:
@@ -71,6 +71,12 @@ def display_records(search=False):
             print('|'.join(record_strings))
 
     else:
+        """
+        ## search == False
+        - Получаем содержимое базы данных
+        - Вывод шапки таблицы и данных
+        """
+
         data = db_read()
         if not data:
             print('Ваш справочник пуст')
@@ -91,6 +97,10 @@ def display_records(search=False):
 
 
 def main():
+    """
+    # Главное меню
+
+    """
     while True:
         display_menu()
         choice = input("Выберите действие: ")
