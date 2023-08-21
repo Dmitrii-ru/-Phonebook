@@ -1,16 +1,24 @@
-from forms import form_new_record
+from forms import form_create_record, form_edit_record, form_search_record
 from db_views import db_read
-from settings import settings_dict
+from settings import settings_dict, fields_text, fields_phone
 
 
-def centered_string(obj):
-    variable = obj
-    total_width = settings_dict['max_length_field']
-    padding = (total_width - len(variable)) // 2
-    obj = ' ' * padding + variable + ' ' * padding
-    if len(obj) < total_width:
-        obj = obj + ' '
-    return '|' + obj + '|'
+def centered_string(obj, custom_wight=None):
+    try:
+        variable = obj
+        total_width = settings_dict['max_length_field']
+        if custom_wight:
+            total_width = custom_wight
+
+        padding = (total_width - len(variable)) // 2
+        obj = ' ' * padding + variable + ' ' * padding
+        if len(obj) < total_width:
+            obj = obj + ' '
+        return obj
+
+    except:
+        print(f'Не корректные данные: {obj}')
+        return main()
 
 
 def display_menu():
@@ -24,46 +32,43 @@ def display_menu():
     print('_______________________')
 
 
-def display_records():
-    data = db_read()
+def display_records(search=False):
+    fields = fields_text + fields_phone
 
-    if not data:
-        print('В телефонном справочнике нет записей')
+    if search:
+        data = form_search_record()
+        if not data:
+            print('Не чего не найдено')
+            main()
+
+        str_fields = '|'.join(centered_string(s) for s in fields)
+        header = f'Результаты поиска: найдено {len(data)}.'
+        print(centered_string(header, len(str_fields)))
+        print("=" * len(str_fields))
+        print(str_fields)
+        print("-" * len(str_fields))
+        for record in data:
+            record_strings = [centered_string(record[field]) for field in fields]
+            print('|'.join(record_strings))
+
     else:
-        print(*
-              [
-                  centered_string('№'),
-                  centered_string('Фамилия'),
-                  centered_string('Имя'),
-                  centered_string('Отчество'),
-                  centered_string('Организация'),
-                  centered_string('Телефон рабочий'),
-                  centered_string('Телефон личный'),
-              ]
-              )
-        for idx, record in enumerate(data, start=1):  # Обходим список, проставляем номер строк
-            print(*
-                  [
-                      centered_string(str(idx)),
-                      centered_string(record['Фамилия']),
-                      centered_string(record['Имя']),
-                      centered_string(record['Отчество']),
-                      centered_string(record['Организация']),
-                      centered_string(record['Телефон рабочий']),
-                      centered_string(record['Телефон личный']),
-                  ]
-                  )
+        data = db_read()
+        if not data:
+            print('Ваш справочник пуст')
+            main()
 
-            # values = list(entry.values())  # Получаем список значений
-            # print(f"{idx}. {', '.join(values)}")
+        str_fields = '|'.join(centered_string(s) for s in ['№'] + fields)
+        header = "Ваш справочник:"
+        print(centered_string(header, len(str_fields)))
+        print("=" * len(str_fields))
+        print(str_fields)
+        print("-" * len(str_fields))
+        num_record = 1
 
-
-def edit_record():
-    pass
-
-
-def search_records():
-    pass
+        for record in data:
+            record_strings = [centered_string(record[field]) for field in fields]
+            print('|'.join([centered_string(str(num_record))] + record_strings))
+            num_record += 1
 
 
 def main():
@@ -73,11 +78,11 @@ def main():
         if choice == "1":
             display_records()
         elif choice == "2":
-            form_new_record()
+            form_create_record()
         elif choice == "3":
-            edit_record()
+            form_edit_record()
         elif choice == "4":
-            search_records()
+            display_records(search=True)
         elif choice == "5":
             break
         else:

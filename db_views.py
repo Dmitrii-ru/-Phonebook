@@ -1,57 +1,56 @@
 import json
 
-
-def move_bad_data_to_file(source_file):
-    with open(f'database/{source_file}', 'r', encoding='utf-8') as file:
-        content = file.read()
-    with open('database/bad_data.txt', 'w', encoding='utf-8') as bad_file:
-        bad_file.write(content)
-
-
 def db_manager(method=None, obj=None):
-    """
-    Создаем запись или отдаем все записи
-    Validate на нужный формат файла
 
-    :param method: 'r' or 'w'
-    :param obj: 'new record'
-    :return: if method=='r' get all records
-    """
-
-    try:
-        if method == 'r':
-            with open('database/phonebook.txt', 'r') as file:
-                data = json.load(file)  # encode в json
+    if method == 'get':
+        try:
+            if method == 'get':
+                with open('database/phonebook.txt', 'r') as file:
+                    data = json.load(file)  # encode в json
+                    return data
+        except (FileNotFoundError, json.JSONDecodeError):  # Если не получилось decoded json
+            print('ERROR :База данных отсутствует или была повреждена, создаем новую')
+            with open('database/phonebook.txt', 'w', encoding='utf-8') as clean_file:  # Open or create and open
+                clean_file.truncate(0)  # Очистить phonebook.txt
+                data = json.dump([], clean_file)  # Создаем пустой список
                 return data
-        elif method == 'w':
-            existing_data = db_manager(method='r', obj=obj)  # Загрузить существующие данные
-            if obj in existing_data:
-                return print('Такая запись уже есть ')
 
-            if existing_data is None:  # Смотрим пустая ли бд
-                existing_data = []  # Приводим файл в формат list
-            existing_data.append(obj)  # Добавить новый словарь
+    elif method == 'post':
+        existing_data = db_manager(method='get')  # Загрузить существующие данные
+        if obj in existing_data:
+            return print('Такая запись уже есть')
+        if existing_data is None:  # Смотрим пустая ли бд
+            existing_data = []  # Приводим файл в формат list
+        existing_data.append(obj)  # Добавить новый словарь
+        try:
+            with open('database/phonebook.txt', 'w') as file:
+                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Записываем новые данные
+            print("Запись успешно добавлена.")
+        except OSError as e:  # Обработка в случаи не возможности записи
+            return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
-            try:
-                with open('database/phonebook.txt', 'w') as file:
-                    json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Загрузить существующие данные
-                print("Запись успешно добавлена.")
-            except OSError as e:  # Обработка в случаи не возможности записи
-                print(f"ERROR : Ошибка записи в файл: {e}")
+    elif method == 'put':
+        existing_data = db_manager(method='get')
+        index_obj = obj['num_record'] - 1
+        field = obj['field']
+        new_field_text = obj['new_field_text']
+        existing_data[index_obj][field] = new_field_text
 
-
-    except (FileNotFoundError, json.JSONDecodeError):  # Если не получилось decoded json
-        print('ERROR :База данных отсутствует или была повреждена, создаем новую')
-        with open('database/phonebook.txt', 'w', encoding='utf-8') as clean_file:  # Open or create and open
-            move_bad_data_to_file('phonebook.txt')  # Переносим поврежденный данные в спец. файл
-            clean_file.truncate(0)  # Очистить phonebook.txt
-            json.dump([], clean_file)  # Создаем пустой список
+        try:
+            with open('database/phonebook.txt', 'w') as file:
+                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Записываем новые данные
+            print("Запись успешно обновлены.")
+        except OSError as e:  # Обработка в случаи не возможности записи
+            return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
 
 def db_read():
-    return db_manager(method='r')  # Получаем decoded список записей
+    return db_manager(method='get')  # Получаем decoded список записей
 
 
 def db_create(new_record):
-    db_manager(method='w', obj=new_record)  # Создаем новую запись
+    db_manager(method='post', obj=new_record)  # Создаем новую запись
 
+
+def db_edit(edit_record):
+    db_manager(method='put', obj=edit_record)  # Изменяем запись
