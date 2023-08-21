@@ -14,12 +14,13 @@ def centered_string(obj, custom_wight=None):
 
     try:
         variable = obj
-        total_width = settings_dict['max_length_field']
-        if custom_wight:
-            total_width = custom_wight
-
+        # Если нет custom_wight то берем settings_dict['max_length_field']
+        total_width = custom_wight if custom_wight else settings_dict['max_length_field']
+        # Вычислим отступы
         padding = (total_width - len(variable)) // 2
+        # Центруем obj в ячейке
         obj = ' ' * padding + variable + ' ' * padding
+        # Проверяем погрешность при // 2
         if len(obj) < total_width:
             obj = obj + ' '
         return obj
@@ -29,25 +30,13 @@ def centered_string(obj, custom_wight=None):
         return main()
 
 
-def display_menu():
-    print('______________________')
-    print("Телефонный справочник.")
-    print("1. Вывод записей")
-    print("2. Добавление записи")
-    print("3. Редактирование записи")
-    print("4. Поиск записей")
-    print("5. Создать 100 записей в базу данных")
-    print("6. Выход")
-
-    print('_______________________')
-
-
 def display_records(search=False):
     """
-    # Функция выводит справочник в консоль
+    # Функция выводит справочника в консоль
     :param search:True маркер который говорит о том что нужно сделать поиск по полям
 
     """
+    # Объединяем default поля в 1 список
     fields = fields_text + fields_phone
 
     if search:
@@ -55,21 +44,27 @@ def display_records(search=False):
         ## search == True
         - Запускает функцию поиска записи по введенным данным 
         - Отображение отфильтрованных данных 
-        - Вывод шапки таблицы и данных
-        """
 
+        """
+        # Запускаем функцию приема данных для поиска
         data = form_search_record()
         if not data:
             print('Не чего не найдено')
             main()
-
+        # Формируем список полей для header
         str_fields = '|'.join(centered_string(s) for s in fields)
-        header = f'Результаты поиска: найдено {len(data)}.'
-        print(centered_string(header, len(str_fields)))
-        print("=" * len(str_fields))
+        # Формируем header
+        header = f'Количество совпадений по запросу: {len(data)}.'
+        # Длинна списка полей
+        custom_wight = len(str_fields)
+        # Задаем длину таблицы
+        print(centered_string(header, custom_wight))
+        print("=" * custom_wight)
         print(str_fields)
-        print("-" * len(str_fields))
+        print("-" * custom_wight)
+        # Обходим все записи
         for record in data:
+            # Формируем строку, обходим default поля, берем нужные поля из record и центруем в ячейке
             record_strings = [centered_string(record[field]) for field in fields]
             print('|'.join(record_strings))
 
@@ -77,14 +72,14 @@ def display_records(search=False):
         """
         ## search == False
         - Получаем содержимое базы данных
-        - Вывод шапки таблицы и данных
+        - Отображение данных 
         """
-
+        # Получаем данные из базы данных
         data = db_read()
         if not data:
             print('Ваш справочник пуст')
             main()
-
+        # Все то же самое что и в search кроме нумерации строк
         str_fields = '|'.join(centered_string(s) for s in ['№'] + fields)
         header = "Ваш справочник:"
         print(centered_string(header, len(str_fields)))
@@ -101,11 +96,24 @@ def display_records(search=False):
 
 def main():
     """
-    # Главное меню
+    Главное меню программы.
+
+    В цикле отображается главное меню с вариантами действий.
+    Пользователь выбирает действие, вводя соответствующую цифру.
 
     """
+
     while True:
-        display_menu()
+        print('______________________')
+        print("Телефонный справочник.")
+        print("1. Список контактов")
+        print("2. Добавление записи")
+        print("3. Редактирование записи")
+        print("4. Поиск записей")
+        print("5. Создать 100 записей в базу данных")
+        print("6. Выход")
+        print('_______________________')
+
         choice = input("Выберите действие: ")
         if choice == "1":
             display_records()

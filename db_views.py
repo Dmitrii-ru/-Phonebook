@@ -8,17 +8,16 @@ def db_manager(method=None, obj=None, ):
     Функция работы с базы данных
 
     """
-    if method == 'get':
+    if method == 'GET':
         """
         Возвращаем все данные бд
 
         """
 
         try:
-            if method == 'get':
-                with open(path, 'r') as file:
-                    data = json.load(file)  # encode в json
-                    return data
+            with open(path, 'r') as file:
+                data = json.load(file)  # encode в json
+                return data
         except (FileNotFoundError, json.JSONDecodeError):  # Если не получилось decoded json
             print('ERROR :База данных отсутствует или была повреждена, создаем новую')
             with open(path, 'w', encoding='utf-8') as clean_file:  # Open or create and open
@@ -26,14 +25,14 @@ def db_manager(method=None, obj=None, ):
                 data = json.dump([], clean_file)  # Создаем пустой список
                 return data
 
-    elif method == 'post':
+    elif method == 'POST':
 
         """
         Запись новых данных в базу данных
         
         """
 
-        existing_data = db_manager(method='get')  # Загрузить существующие данные
+        existing_data = db_manager(method='GET')  # Загрузить существующие данные
         if existing_data is None:  # Смотрим пустая ли бд
             existing_data = []  # Приводим файл в формат list
         else:
@@ -48,7 +47,7 @@ def db_manager(method=None, obj=None, ):
         except OSError as e:  # Обработка в случаи не возможности записи
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
-    elif method == 'put':
+    elif method == 'PUT':
         """
        Обновляю поля записей 
 
@@ -69,12 +68,12 @@ def db_manager(method=None, obj=None, ):
 
 
 def db_read():
-    return db_manager(method='get')  # Получаем decoded список записей
+    return db_manager(method='GET')  # Получаем decoded список записей
 
 
 def db_create(new_record, custom_path=None):
-    db_manager(method='post', obj=new_record)  # Создаем новую запись
+    db_manager(method='POST', obj=new_record)  # Создаем новую запись
 
 
 def db_edit(edit_record):
-    db_manager(method='put', obj=edit_record)  # Изменяем запись
+    db_manager(method='PUT', obj=edit_record)  # Изменяем запись

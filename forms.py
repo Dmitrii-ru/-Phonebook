@@ -23,14 +23,15 @@ def validate_text(field, field_text_user):
     # Validata введенных данных
     - Проверка полей ['Фамилия', 'Имя', 'Отчество', 'Организация']
 
-    :param field: 'Имя'
-    :param field_text_user: 'Толя'
+    :param field: Имя поля объекта
+    :param field_text_user: текст объекта
     :return: True если прошел проверку
     """
-
+    # Получить максимальную длину поля
     max_l = settings_dict.get('max_length_field', 30)
+    # Длина введенного текста
     len_obj = len(field_text_user)
-    obj = field_text_user
+
     if len_obj < 2:
         print(f'Error:Поле {field} должна содержать не менее 2 символов, введенные данные "{field_text_user}"')
         return False
@@ -40,7 +41,7 @@ def validate_text(field, field_text_user):
               f'введенные данные "{field_text_user}" длинна {len(field_text_user)}')
         return False
 
-    elif any(char.isdigit() for char in obj):
+    elif any(char.isdigit() for char in field_text_user):
         print(f'Error:Поле {field} не должна содержать цифры, введенные данные "{field_text_user}"')
         return False
 
@@ -56,10 +57,8 @@ def validate_phone_number(field, field_phone_user):
     :param field_phone_user: '+7(929)927-19-00'
     :return: True если прошел проверку
     """
-    obj = field_phone_user
-    if obj == 'exit':
-        exit_to_main()
-    elif not reg_phone_number.match(obj):  # Поверяем на соответствие регулярному выражению
+
+    if not reg_phone_number.match(field_phone_user):  # Поверяем на соответствие регулярному выражению
         print(f'{field_phone_user} должен быть формата +7(XXX)XXX-XX-XX", например: +7(929)927-19-00')
         return False
     return True
@@ -74,12 +73,15 @@ def form_create_record():
     """
 
     new_record = {}
-
+    print('---------------------')
+    print("Создание новой записи")
+    print('---------------------')
     for field in fields_text:
         while True:
             field_text_user = input(f'{field}: ')
             if field_text_user == 'exit':
-                exit_to_main()
+                return
+
             if validate_text(field, field_text_user):  # Если проходим validata
                 new_record[field] = field_text_user  # Добавляем новое поле в новую запись
                 break
@@ -88,10 +90,11 @@ def form_create_record():
         while True:
             field_phone_user = input(f'{field}: ')
             if field_phone_user == 'exit':
-                exit_to_main()
+               return
             if validate_phone_number(field, field_phone_user):  # Если проходим validata
                 new_record[field] = field_phone_user  # Добавляем новое поле в новую запись
                 break
+
     db_create(new_record)  # Создаем новую запись
 
 
@@ -120,8 +123,8 @@ def form_edit_record():
     print('_____________________________________________________________________')
 
     while True:
-
         objs = input("Введите данные: ")
+        # Количество записей в бахе данных
         len_db = len(db_read())
         if objs == 'exit':
             break
@@ -131,21 +134,29 @@ def form_edit_record():
             continue
 
         try:
+            # Обходим объекты редактирования
             for obj in objs.split(','):
+                # Объект редактирования и указания для редакции
                 obj_split = obj.split('/')
-
+                # Строка записи
                 num_record = int(obj_split[0])
+                # Поле которые нужно редактировать
                 field_user = obj_split[1]
+                # Новое значение
                 new_field_text = obj_split[2]
 
+                # Есть ли поле в списке полей программы
                 if field_user in fields:
+                    # Запускаем проверку введенных данных согласно типу поля
                     if field_user in fields_text:
                         val = validate_text(field_user, new_field_text)
                     else:
                         val = validate_phone_number(field_user, new_field_text)
 
                     if val:
+                        # Проверим корректность номера строки
                         if 1 <= num_record <= len_db:
+                            # Запускаем функцию редакции записи
                             db_edit(
                                 {
                                     'num_record': num_record,
@@ -188,15 +199,16 @@ def form_search_record():
         }
     ]
     """
-    params = fields_text + fields_phone
+    fields = fields_text + fields_phone
     print('_____________________________________________________________________')
     print('Поиск записей.')
-    print('Доступные поля:', ', '.join(params))
+    print('Доступные поля:', ', '.join(fields))
     print('Пример ввода.')
     print('Ищем по 1 полю: название_поле/текст_поиска.')
     print('Если вы хотение искать по нескольким, разделите их запятой.')
     print('Имя/Вася,Отчество/Васильевич')
     print('_____________________________________________________________________')
+    # Словарь параметров поиска
     search_params = {}
 
     while True:
@@ -215,19 +227,24 @@ def form_search_record():
             continue
 
         try:
-
+            # Обходим объекты поиска
             for obj in objs.split(','):
+                # Поле поиска и значение
                 obj_s = obj.split('/')
 
                 search_field = obj_s[0]
                 search_text = obj_s[1]
 
-                if search_field in params:
+                # Проверка корректности введенного поля
+                if search_field in fields:
+                    # Добавляем или заменяем параметры поиска
                     search_params.setdefault(search_field, search_text)
 
             if search_params:
                 data = []
+                # Обходим базу данных
                 for record in db:
+                    # Обходим search_params и вхождение текста поиска в поле поиска
                     if all(v.lower() in record[k].lower() for k, v in search_params.items()):
                         data.append(record)
                 return data
