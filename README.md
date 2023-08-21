@@ -34,5 +34,5 @@ ___
 ## Запуск проекта :
 - python 3.10
 - clone  https://github.com/Dmitrii-ru/-Phonebook.git
-- 
+- /phonebook  commend : python main.py
 
