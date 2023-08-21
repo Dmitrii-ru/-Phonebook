@@ -4,6 +4,16 @@ from settings import settings_dict, fields_text, fields_phone
 
 
 def centered_string(obj, custom_wight=None):
+    """
+    Функция центрует запись при отображении таблицы
+
+
+
+    :param obj: текст центровки
+    :param custom_wight: кастамные настройки ширины ячейки
+    :return: строка с текстом по центру ячейки
+    """
+
     try:
         variable = obj
         total_width = settings_dict['max_length_field']
@@ -33,9 +43,18 @@ def display_menu():
 
 
 def display_records(search=False):
+    """
+    Функция выводит справочник в консоль
+
+
+
+    :param search: True
+    :return: None
+    """
     fields = fields_text + fields_phone
 
     if search:
+
         data = form_search_record()
         if not data:
             print('Не чего не найдено')
