@@ -49,8 +49,8 @@ def db_manager(method=None, obj=None, ):
 
     elif method == 'PUT':
         """
-       Обновляю поля записей 
-
+        Обновляю поля записей 
+        
         """
 
         existing_data = db_manager(method='get')  # Загрузить существующие данные
