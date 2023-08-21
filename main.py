@@ -1,3 +1,4 @@
+from database.generator_db import generate_records
 from forms import form_create_record, form_edit_record, form_search_record
 from db_views import db_read
 from settings import settings_dict, fields_text, fields_phone
@@ -35,7 +36,9 @@ def display_menu():
     print("2. Добавление записи")
     print("3. Редактирование записи")
     print("4. Поиск записей")
-    print("5. Выход")
+    print("5. Создать 100 записей в базу данных")
+    print("6. Выход")
+
     print('_______________________')
 
 
@@ -113,6 +116,8 @@ def main():
         elif choice == "4":
             display_records(search=True)
         elif choice == "5":
+            generate_records()
+        elif choice == "6":
             break
         else:
             print("Некорректный выбор")

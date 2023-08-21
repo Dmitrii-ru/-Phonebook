@@ -80,8 +80,8 @@ def form_create_record():
             field_text_user = input(f'{field}: ')
             if field_text_user == 'exit':
                 exit_to_main()
-            if validate_text(field, field_text_user):
-                new_record[field] = field_text_user
+            if validate_text(field, field_text_user):  # Если проходим validata
+                new_record[field] = field_text_user  # Добавляем новое поле в новую запись
                 break
 
     for field in fields_phone:
@@ -89,10 +89,10 @@ def form_create_record():
             field_phone_user = input(f'{field}: ')
             if field_phone_user == 'exit':
                 exit_to_main()
-            if validate_phone_number(field, field_phone_user):
-                new_record[field] = field_phone_user
+            if validate_phone_number(field, field_phone_user):  # Если проходим validata
+                new_record[field] = field_phone_user  # Добавляем новое поле в новую запись
                 break
-    db_create(new_record)
+    db_create(new_record)  # Создаем новую запись
 
 
 def form_edit_record():
@@ -101,12 +101,18 @@ def form_edit_record():
     - Получаем старку, разбиваем на строки объекты, объекты разбиваем на параметры
     - Проверки на корректность введенных данных
     - Передаем данные для изменения
-
+    db_edit(
+                {
+                    'num_record': num_record,
+                    'field': field_user,
+                    'new_field_text': new_field_text,
+                }
+    )
     """
-    params = fields_text + fields_phone
+    fields = fields_text + fields_phone
     print('_____________________________________________________________________')
     print('Редактор записей.')
-    print('Доступные поля:', ', '.join(params))
+    print('Доступные поля:', ', '.join(fields))
     print('Пример ввода.')
     print('Редактируем одно поле: номер_строки/название_поле/новый_текст.')
     print('Если вы хотение отредактировать несколько полей, разделите их запятой.')
@@ -126,24 +132,24 @@ def form_edit_record():
 
         try:
             for obj in objs.split(','):
-                obj_s = obj.split('/')
+                obj_split = obj.split('/')
 
-                num_record = int(obj_s[0])
-                field = obj_s[1]
-                new_field_text = obj_s[2]
+                num_record = int(obj_split[0])
+                field_user = obj_split[1]
+                new_field_text = obj_split[2]
 
-                if field in params:
-                    if field in fields_text:
-                        val = validate_text(field, new_field_text)
+                if field_user in fields:
+                    if field_user in fields_text:
+                        val = validate_text(field_user, new_field_text)
                     else:
-                        val = validate_phone_number(field, new_field_text)
+                        val = validate_phone_number(field_user, new_field_text)
 
                     if val:
                         if 1 <= num_record <= len_db:
                             db_edit(
                                 {
                                     'num_record': num_record,
-                                    'field': field,
+                                    'field': field_user,
                                     'new_field_text': new_field_text,
                                 }
                             )
