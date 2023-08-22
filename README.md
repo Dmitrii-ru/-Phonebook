@@ -35,4 +35,6 @@ ___
 - python 3.10
 - clone  https://github.com/Dmitrii-ru/-Phonebook.git
 - /phonebook  commend : python main.py
-
+# P.S. 
+- Приложение реализовано максимально просто и примитивно, без посторонних библиотек. 
+- Скачал, запустил! 
