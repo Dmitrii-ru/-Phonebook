@@ -49,7 +49,7 @@ def display_records(search=False):
         # Запускаем функцию приема данных для поиска
         data = form_search_record()
         if not data:
-            print('Не чего не найдено')
+            print('Ничего не найдено')
             main()
         # Формируем список полей для header
         str_fields = '|'.join(centered_string(s) for s in fields)

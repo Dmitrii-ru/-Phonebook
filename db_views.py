@@ -44,7 +44,7 @@ def db_manager(method=None, obj=None, ):
             with open(path, 'w') as file:
                 json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Записываем новые данные
             print("Запись успешно добавлена.")
-        except OSError as e:  # Обработка в случаи не возможности записи
+        except OSError as e:
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
     elif method == 'PUT':
@@ -54,7 +54,7 @@ def db_manager(method=None, obj=None, ):
         """
 
         existing_data = db_manager(method='get')  # Загрузить существующие данные
-        index_obj = obj['num_record'] - 1  # Получаем индекс
+        index_obj = obj['num_record'] - 1  # Индекс
         field = obj['field']  # Поле которое нужно изменить
         new_field_text = obj['new_field_text']  # На что нужно изменить
         existing_data[index_obj][field] = new_field_text  # Меняем значение
@@ -63,7 +63,7 @@ def db_manager(method=None, obj=None, ):
             with open(path, 'w') as file:
                 json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Записываем новые данные
             print("Записи успешно обновлены.")
-        except OSError as e:  # Обработка в случаи не возможности записи
+        except OSError as e:
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
 
