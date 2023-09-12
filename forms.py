@@ -27,9 +27,7 @@ def validate_text(field, field_text_user):
     :param field_text_user: текст объекта
     :return: True если прошел проверку
     """
-    # Получить максимальную длину поля
     max_l = settings_dict.get('max_length_field', 30)
-    # Длина введенного текста
     len_obj = len(field_text_user)
 
     if len_obj < 2:
@@ -82,8 +80,8 @@ def form_create_record():
             if field_text_user == 'exit':
                 return
 
-            if validate_text(field, field_text_user):  # Если проходим validata
-                new_record[field] = field_text_user  # Добавляем новое поле в новую запись
+            if validate_text(field, field_text_user):
+                new_record[field] = field_text_user
                 break
 
     for field in fields_phone:
@@ -91,8 +89,8 @@ def form_create_record():
             field_phone_user = input(f'{field}: ')
             if field_phone_user == 'exit':
                return
-            if validate_phone_number(field, field_phone_user):  # Если проходим validata
-                new_record[field] = field_phone_user  # Добавляем новое поле в новую запись
+            if validate_phone_number(field, field_phone_user):
+                new_record[field] = field_phone_user
                 break
 
     db_create(new_record)  # Создаем новую запись
@@ -124,7 +122,6 @@ def form_edit_record():
 
     while True:
         objs = input("Введите данные: ")
-        # Количество записей в бахе данных
         len_db = len(db_read())
         if objs == 'exit':
             break
@@ -134,29 +131,19 @@ def form_edit_record():
             continue
 
         try:
-            # Обходим объекты редактирования
             for obj in objs.split(','):
-                # Объект редактирования и указания для редакции
                 obj_split = obj.split('/')
-                # Строка записи
                 num_record = int(obj_split[0])
-                # Поле которые нужно редактировать
                 field_user = obj_split[1]
-                # Новое значение
                 new_field_text = obj_split[2]
-
-                # Есть ли поле в списке полей программы
                 if field_user in fields:
-                    # Запускаем проверку введенных данных согласно типу поля
                     if field_user in fields_text:
                         val = validate_text(field_user, new_field_text)
                     else:
                         val = validate_phone_number(field_user, new_field_text)
 
                     if val:
-                        # Проверим корректность номера строки
                         if 1 <= num_record <= len_db:
-                            # Запускаем функцию редакции записи
                             db_edit(
                                 {
                                     'num_record': num_record,
@@ -208,7 +195,6 @@ def form_search_record():
     print('Если вы хотение искать по нескольким, разделите их запятой.')
     print('Имя/Вася,Отчество/Васильевич')
     print('_____________________________________________________________________')
-    # Словарь параметров поиска
     search_params = {}
 
     while True:
@@ -227,24 +213,16 @@ def form_search_record():
             continue
 
         try:
-            # Обходим объекты поиска
             for obj in objs.split(','):
-                # Поле поиска и значение
                 obj_s = obj.split('/')
-
                 search_field = obj_s[0]
                 search_text = obj_s[1]
-
-                # Проверка корректности введенного поля
                 if search_field in fields:
-                    # Добавляем или заменяем параметры поиска
                     search_params.setdefault(search_field, search_text)
 
             if search_params:
                 data = []
-                # Обходим базу данных
                 for record in db:
-                    # Обходим search_params и вхождение текста поиска в поле поиска
                     if all(v.lower() in record[k].lower() for k, v in search_params.items()):
                         data.append(record)
                 return data

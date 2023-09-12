@@ -16,11 +16,11 @@ def db_manager(method=None, obj=None, ):
 
         try:
             with open(path, 'r') as file:
-                data = json.load(file)  # encode в json
+                data = json.load(file)
                 return data
-        except (FileNotFoundError, json.JSONDecodeError):  # Если не получилось decoded json
+        except (FileNotFoundError, json.JSONDecodeError):
             print('ERROR :База данных отсутствует или была повреждена, создаем новую')
-            with open(path, 'w', encoding='utf-8') as clean_file:  # Open or create and open
+            with open(path, 'w', encoding='utf-8') as clean_file:
                 clean_file.truncate(0)  # Очистить phonebook.txt
                 data = json.dump([], clean_file)  # Создаем пустой список
                 return data
@@ -32,17 +32,17 @@ def db_manager(method=None, obj=None, ):
         
         """
 
-        existing_data = db_manager(method='GET')  # Загрузить существующие данные
-        if existing_data is None:  # Смотрим пустая ли бд
-            existing_data = []  # Приводим файл в формат list
+        existing_data = db_manager(method='GET')
+        if existing_data is None:
+            existing_data = []
         else:
             if obj in existing_data:
                 return print('Такая запись уже есть')
-        existing_data.append(obj)  # Добавить новый словарь
+        existing_data.append(obj)
         try:
 
             with open(path, 'w') as file:
-                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Записываем новые данные
+                json.dump(existing_data, file, indent=2, ensure_ascii=False)
             print("Запись успешно добавлена.")
         except OSError as e:
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
@@ -53,15 +53,15 @@ def db_manager(method=None, obj=None, ):
         
         """
 
-        existing_data = db_manager(method='get')  # Загрузить существующие данные
-        index_obj = obj['num_record'] - 1  # Индекс
-        field = obj['field']  # Поле которое нужно изменить
-        new_field_text = obj['new_field_text']  # На что нужно изменить
-        existing_data[index_obj][field] = new_field_text  # Меняем значение
+        existing_data = db_manager(method='get')
+        index_obj = obj['num_record'] - 1
+        field = obj['field']
+        new_field_text = obj['new_field_text']
+        existing_data[index_obj][field] = new_field_text
 
         try:
             with open(path, 'w') as file:
-                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Обновляем данные
+                json.dump(existing_data, file, indent=2, ensure_ascii=False)
             print("Записи успешно обновлены.")
         except OSError as e:
             return print(f"ERROR : Ошибка записи в базу данных: {e}")

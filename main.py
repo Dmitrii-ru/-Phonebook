@@ -14,13 +14,9 @@ def centered_string(obj, custom_wight=None):
 
     try:
         variable = obj
-        # Если нет custom_wight то берем settings_dict['max_length_field']
         total_width = custom_wight if custom_wight else settings_dict['max_length_field']
-        # Вычислим отступы
         padding = (total_width - len(variable)) // 2
-        # Центруем obj в ячейке
         obj = ' ' * padding + variable + ' ' * padding
-        # Проверяем погрешность при // 2
         if len(obj) < total_width:
             obj = obj + ' '
         return obj
@@ -36,7 +32,6 @@ def display_records(search=False):
     :param search:True маркер который говорит о том что нужно сделать поиск по полям
 
     """
-    # Объединяем default поля в 1 список
     fields = fields_text + fields_phone
 
     if search:
@@ -46,23 +41,18 @@ def display_records(search=False):
         - Отображение отфильтрованных данных 
 
         """
-        # Запускаем функцию приема данных для поиска
+
         data = form_search_record()
         if not data:
             print('Ничего не найдено')
             main()
-        # Формируем список полей для header
         str_fields = '|'.join(centered_string(s) for s in fields)
-        # Формируем header
         header = f'Количество совпадений по запросу: {len(data)}.'
-        # Длинна списка полей
         custom_wight = len(str_fields)
-        # Задаем длину таблицы
         print(centered_string(header, custom_wight))
         print("=" * custom_wight)
         print(str_fields)
         print("-" * custom_wight)
-        # Обходим все записи
         for record in data:
             # Формируем строку, обходим default поля, берем нужные поля из record и центруем в ячейке
             record_strings = [centered_string(record[field]) for field in fields]
@@ -74,12 +64,10 @@ def display_records(search=False):
         - Получаем содержимое базы данных
         - Отображение данных 
         """
-        # Получаем данные из базы данных
         data = db_read()
         if not data:
             print('Ваш справочник пуст')
             main()
-        # Все то же самое что и в search кроме нумерации строк
         str_fields = '|'.join(centered_string(s) for s in ['№'] + fields)
         header = "Ваш справочник:"
         print(centered_string(header, len(str_fields)))
