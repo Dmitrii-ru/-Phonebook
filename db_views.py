@@ -61,7 +61,7 @@ def db_manager(method=None, obj=None, ):
 
         try:
             with open(path, 'w') as file:
-                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Запись новых данных
+                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Обновляем данные
             print("Записи успешно обновлены.")
         except OSError as e:
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
