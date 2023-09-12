@@ -5,7 +5,7 @@ def db_manager(method=None, obj=None, ):
     path = 'database/phonebook.txt'
 
     """
-    Функция работы с базы данных
+    Функция работы с базой данных
 
     """
     if method == 'GET':
@@ -61,19 +61,19 @@ def db_manager(method=None, obj=None, ):
 
         try:
             with open(path, 'w') as file:
-                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Записываем новые данные
+                json.dump(existing_data, file, indent=2, ensure_ascii=False)  # Запись новых данных
             print("Записи успешно обновлены.")
         except OSError as e:
             return print(f"ERROR : Ошибка записи в базу данных: {e}")
 
 
 def db_read():
-    return db_manager(method='GET')  # Получаем decoded список записей
+    return db_manager(method='GET')  # Получить decoded список записей
 
 
 def db_create(new_record, custom_path=None):
-    db_manager(method='POST', obj=new_record)  # Создаем новую запись
+    db_manager(method='POST', obj=new_record)  # Создать новую запись
 
 
 def db_edit(edit_record):
-    db_manager(method='PUT', obj=edit_record)  # Изменяем запись
+    db_manager(method='PUT', obj=edit_record)  # Изменить запись
